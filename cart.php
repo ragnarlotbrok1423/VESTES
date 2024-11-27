@@ -1,3 +1,43 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit;
+}
+
+$userId = $_SESSION['user']['id'];
+
+function getCartItems($userId) {
+    $apiUrl = "http://localhost/apirest/Cart/getByUser/$userId";
+    $response = file_get_contents($apiUrl);
+
+    if ($response === false) {
+        echo "Error al obtener los datos del carrito.";
+        return [];
+    }
+
+    return json_decode($response, true);
+}
+
+$cartItems = getCartItems($userId);
+
+function getAddress($userId) {
+    $apiUrl = "http://localhost/apirest/Address/getActiveAddress/$userId";
+    $response = file_get_contents($apiUrl);
+
+    if ($response === false) {
+        echo "Error al obtener la direccion de envio.";
+        return [];
+    }
+
+    return json_decode($response, true);
+}
+
+$address = getAddress($userId);
+?>
+
+
 <!doctype html>
 <html lang="es">
 <head>
@@ -58,72 +98,53 @@
 
     <!-- Lista de productos -->
     <div class="space-y-4 bg-white p-4 rounded-lg shadow">
-        <!-- Producto 1 -->
-        <div class="flex items-center space-x-4 border-b pb-4">
-            <img src="https://via.placeholder.com/80" alt="Camiseta" class="w-20 h-20 object-cover rounded-md">
-            <div class="flex-grow">
-                <h2 class="font-semibold">Camiseta</h2>
-                <p class="text-gray-600">$19.99</p>
-            </div>
-            <div class="flex items-center space-x-2">
-                <button class="px-2 py-1 bg-gray-200 rounded">-</button>
-                <span>2</span>
-                <button class="px-2 py-1 bg-gray-200 rounded">+</button>
-            </div>
-            <p class="font-semibold">$39.98</p>
-            <button class="text-red-500 hover:text-red-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
+         <?php if (!empty($cartItems)): ?>
+            <?php $total = 0; ?>
+            <?php foreach ($cartItems as $item): ?>
+                <?php
+                $imageUrl = $item['product_image'];
+                if (empty($imageUrl)) {
+                    $imageUrl = '/uploads/mati.png';
+                }
+                $itemTotal = $item['product_price'] * $item['quantity'];
+                $total += $itemTotal;
+                ?>
 
-        <!-- Producto 2 -->
-        <div class="flex items-center space-x-4 border-b pb-4">
-            <img src="https://via.placeholder.com/80" alt="Pantalón" class="w-20 h-20 object-cover rounded-md">
+      <div class="flex items-center space-x-4 border-b pb-4">
+            <img src="http://localhost/apirest/<?php echo $imageUrl; ?>"  class="w-20 h-20 object-cover rounded-md">
             <div class="flex-grow">
-                <h2 class="font-semibold">Pantalón</h2>
-                <p class="text-gray-600">$39.99</p>
+                <h2 class="font-semibold"><?php echo htmlspecialchars($item['product_name']); ?></h2>
+                <p class="text-gray-600">$<?php echo htmlspecialchars($item['product_price']); ?></p>
             </div>
             <div class="flex items-center space-x-2">
                 <button class="px-2 py-1 bg-gray-200 rounded">-</button>
-                <span>1</span>
+                <span><?php echo htmlspecialchars($item['quantity']); ?></span>
                 <button class="px-2 py-1 bg-gray-200 rounded">+</button>
             </div>
-            <p class="font-semibold">$39.99</p>
-            <button class="text-red-500 hover:text-red-700">
+            <p class="font-semibold">$<?php echo number_format($itemTotal, 2); ?></p>
+             <form action="delete_cart_item.php" method="POST" style="display: inline;">
+            <button type="submit" class="text-red-500 hover:text-red-700">
+                <input type="hidden" name="user_id" value="<?php echo $userId; ?>">
+                            <input type="hidden" name="product_id" value="<?php echo $item['product_id']; ?>">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-        </div>
 
-        <!-- Producto 3 -->
-        <div class="flex items-center space-x-4 pb-4">
-            <img src="https://via.placeholder.com/80" alt="Zapatos" class="w-20 h-20 object-cover rounded-md">
-            <div class="flex-grow">
-                <h2 class="font-semibold">Zapatos</h2>
-                <p class="text-gray-600">$59.99</p>
-            </div>
-            <div class="flex items-center space-x-2">
-                <button class="px-2 py-1 bg-gray-200 rounded">-</button>
-                <span>1</span>
-                <button class="px-2 py-1 bg-gray-200 rounded">+</button>
-            </div>
-            <p class="font-semibold">$59.99</p>
-            <button class="text-red-500 hover:text-red-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
+            </form>
         </div>
+        <?php endforeach; ?>
+        <?php else: ?>
+            <p>Tu carrito está vacío.</p>
+        <?php endif; ?>
+
     </div>
 
     <!-- Resumen del carrito -->
     <div class="mt-8 bg-white p-4 rounded-lg shadow">
         <div class="flex justify-between mb-2">
             <span>Subtotal:</span>
-            <span>$139.96</span>
+            <span>$<?php echo number_format($total ?? 0, 2); ?></span>
         </div>
         <div class="flex justify-between mb-2">
             <span>Envío:</span>
@@ -131,7 +152,7 @@
         </div>
         <div class="flex justify-between font-bold">
             <span>Total:</span>
-            <span>$139.96</span>
+            <span>$<?php echo number_format($total ?? 0, 2); ?></span>
         </div>
     </div>
 
