@@ -114,7 +114,7 @@ $address = getAddress($userId);
       <div class="flex items-center space-x-4 border-b pb-4">
 
 
-            <img src="http://localhost/apirest/<?php echo $imageUrl; ?>"  class="w-20 h-20 object-cover rounded-md">
+            <img src="http://localhost/ApiRest/<?php echo $imageUrl; ?>"  class="w-20 h-20 object-cover rounded-md">
             <div class="flex-grow">
                 <h2 class="font-semibold"><?php echo htmlspecialchars($item['product_name']); ?></h2>
                 <p class="text-gray-600">$<?php echo htmlspecialchars($item['product_price']); ?></p>

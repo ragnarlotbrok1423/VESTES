@@ -50,7 +50,7 @@
         if (errorCode === 1) {
             errorMessage = 'Credenciales incorrectas. Por favor, intenta de nuevo.';
         } else if (errorCode === 2) {
-            errorMessage = 'Error al conectar con la API. Por favor,Cambia apirest a ApiRest';
+            errorMessage = 'Error al conectar con la API. Por favor,Cambia ApiRest a ApiRest';
         }
 
         if (errorMessage) {

@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     );
 
     // Inicializar cURL
-    $ch = curl_init('http://localhost/apirest/Costumer/create');
+    $ch = curl_init('http://localhost/ApiRest/Costumer/create');
 
     // Configurar opciones de cURL
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
