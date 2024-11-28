@@ -9,7 +9,7 @@ if (!isset($_SESSION['user'])) {
 $userId = $_SESSION['user']['id'];
 
 function getCartItems($userId) {
-    $apiUrl = "http://localhost/apirest/Cart/getByUser/$userId";
+    $apiUrl = "http://localhost/ApiRest/Cart/getByUser/$userId";
     $response = file_get_contents($apiUrl);
 
     if ($response === false) {
@@ -23,7 +23,7 @@ function getCartItems($userId) {
 $cartItems = getCartItems($userId);
 
 function getAddress($userId) {
-    $apiUrl = "http://localhost/apirest/Address/getActiveAddress/$userId";
+    $apiUrl = "http://localhost/ApiRest/Address/getActiveAddress/$userId";
     $response = file_get_contents($apiUrl);
 
     if ($response === false) {
@@ -44,6 +44,7 @@ $address = getAddress($userId);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="styles.css" rel="stylesheet">
+    <script src="cartAddFunctionality.js" />
 
     <script src="https://cdn.jsdelivr.net/npm/flowbite@1.6.4/dist/flowbite.min.js"></script>
     <title>Cart</title>
@@ -111,16 +112,67 @@ $address = getAddress($userId);
                 ?>
 
       <div class="flex items-center space-x-4 border-b pb-4">
+
+
             <img src="http://localhost/apirest/<?php echo $imageUrl; ?>"  class="w-20 h-20 object-cover rounded-md">
             <div class="flex-grow">
                 <h2 class="font-semibold"><?php echo htmlspecialchars($item['product_name']); ?></h2>
                 <p class="text-gray-600">$<?php echo htmlspecialchars($item['product_price']); ?></p>
             </div>
-            <div class="flex items-center space-x-2">
-                <button class="px-2 py-1 bg-gray-200 rounded">-</button>
-                <span><?php echo htmlspecialchars($item['quantity']); ?></span>
-                <button class="px-2 py-1 bg-gray-200 rounded">+</button>
-            </div>
+
+
+          <!-- increment & decrease Buttons -->
+          <div class="flex items-center space-x-2">
+
+
+              <Form action="changeQuantityProduct.php" method="POST" style="display:inline;" >
+              <button class="px-2 py-1 bg-gray-200 rounded decrement-btn" data-id="<?php echo $item['product_id']; ?>">
+
+                  <!--Obtenemos el valor del usuario -->
+                  <input type="hidden" name="user_id" value="<?php
+                  echo $userId;
+                  ?>" >
+
+                    <!--Obtenemos el valor del producto -->
+                  <input type="hidden" name="product_id" value="<?php
+                  echo $item['product_id'];
+                  ?>">
+
+                    <!--Obtenemos la cantidad que queremos cambiar-->
+                  <input type="hidden" name="quantity" value="<?php
+                  echo $item['quantity'] -1 ;
+                  ?>">
+
+
+
+                  -</button>
+                </Form>
+
+              <span id="quantity-<?php echo $item['product_id']; ?>"><?php echo htmlspecialchars($item['quantity']); ?></span>
+
+              <Form action="changeQuantityProduct.php" method="POST" style="display:inline;" >
+              <button class="px-2 py-1 bg-gray-200 rounded increment-btn" data-id="<?php echo $item['product_id']; ?>">
+
+                  <!--Obtenemos el valor del usuario -->
+                  <input type="hidden" name="user_id" value="<?php
+                  echo $userId;
+                  ?>" >
+
+                  <!--Obtenemos el valor del producto -->
+                  <input type="hidden" name="product_id" value="<?php
+                  echo $item['product_id'];
+                  ?>">
+
+                  <!--Obtenemos la cantidad que queremos cambiar-->
+                  <input type="hidden" name="quantity" value="<?php
+                  echo $item['quantity'] + 1;
+                  ?>">
+
+                  +</button>
+                </Form>
+          </div>
+
+
             <p class="font-semibold">$<?php echo number_format($itemTotal, 2); ?></p>
              <form action="delete_cart_item.php" method="POST" style="display: inline;">
             <button type="submit" class="text-red-500 hover:text-red-700">
@@ -132,6 +184,7 @@ $address = getAddress($userId);
             </button>
 
             </form>
+
         </div>
         <?php endforeach; ?>
         <?php else: ?>

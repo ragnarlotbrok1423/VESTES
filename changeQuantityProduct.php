@@ -1,20 +1,20 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+if ($_SERVER ['REQUEST_METHOD'] == 'POST') {
     $userId = $_POST['user_id'];
     $productId = $_POST['product_id'];
+    $quantity = $_POST['quantity'];
 
     $data = [
         'user_id' => $userId,
-        'product_id' => $productId
+        'product_id' => $productId,
+        'quantity' => $quantity
     ];
 
-    
     $jsonData = json_encode($data);
 
-   
-    $ch = curl_init("http://localhost/ApiRest/Cart/delete");
+    $ch = curl_init("http://localhost/ApiRest/Cart/update");
 
-    
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
@@ -25,15 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $response = curl_exec($ch);
 
-    if(curl_errno($ch)) {
+    if (curl_errno($ch)) {
         echo 'Error:' . curl_error($ch);
     }
 
-    
     curl_close($ch);
 
-    // Redirigir al carrito de nuevo después de eliminar el producto
     header('Location: cart.php');
     exit;
 }
-?>

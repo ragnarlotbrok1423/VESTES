@@ -1,6 +1,6 @@
 <?php
 session_start();
-$apiUrl = 'http://localhost/apirest/Costumer/login';
+$apiUrl = 'http://localhost/ApiRest/Costumer/login';
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
