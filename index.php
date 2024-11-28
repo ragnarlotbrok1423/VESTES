@@ -3,7 +3,7 @@ session_start();
 
 function getProductsFromAPI($endpoint)
 {
-    $apiUrl = "http://localhost/ApiRest/products/$endpoint";
+    $apiUrl = "http://localhost/apirest/products/$endpoint";
     $response = file_get_contents($apiUrl);
 
 
