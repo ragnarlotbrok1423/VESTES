@@ -35,11 +35,28 @@
 
                 <p class="text-center text-sm text-gray-600">
                     Don't have an account?
-                    <a href="#" class="text-blue-600 hover:underline">Sign up</a>
+                    <a href="register.php" class="text-blue-600 hover:underline">Sign up</a>
                 </p>
             </form>
         </div>
     </div>
 </div>
+
+<?php if (isset($_GET['error'])): ?>
+    <script>
+        let errorMessage = '';
+        const errorCode = <?php echo $_GET['error']; ?>;
+        
+        if (errorCode === 1) {
+            errorMessage = 'Credenciales incorrectas. Por favor, intenta de nuevo.';
+        } else if (errorCode === 2) {
+            errorMessage = 'Error al conectar con la API. Por favor,Cambia apirest a ApiRest';
+        }
+
+        if (errorMessage) {
+            alert(errorMessage);
+        }
+    </script>
+<?php endif; ?>
 </body>
 </html>

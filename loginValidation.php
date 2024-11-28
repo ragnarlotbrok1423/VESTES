@@ -1,6 +1,6 @@
 <?php
 session_start();
-$apiUrl = 'http://localhost/ApiRest/Costumer/login';
+$apiUrl = 'http://localhost/apirest/Costumer/login';
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -41,11 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: ../VESTES/index.php');
         exit;
     } else {
-        echo "Error: " . ($data['message'] ?? 'Credenciales incorrectas.');
-        exit;
+          header('Location: login.php?error=1');
+            exit;
     }
 } else {
-    echo "Error al conectar con la API.";
-    exit;
+    header('Location: login.php?error=2');
+        exit;
 }
 }
