@@ -1,3 +1,36 @@
+<?php
+session_start();
+
+
+function getProductFromAPI() {
+      $productId = $_POST['productId'] ?? $_GET['id'] ?? null;
+
+    if (!$productId) {
+        echo "Error: ID del producto no proporcionado";
+        exit;
+    }
+
+    // Construye la URL de la API usando el ID del producto
+    $apiUrl = "http://localhost/apirest/products/getById/" . $productId;
+    $response = file_get_contents($apiUrl);
+
+    if ($response === false) {
+        echo "Error al obtener producto de la API";
+        return [];
+    }
+
+    return json_decode($response, true);
+}
+
+$product = getProductFromAPI();
+
+$imageUrl = $product['image_url'];
+                if (empty($imageUrl)) {
+                    $imageUrl = '/uploads/mati.png';
+                }
+
+?>
+
 <!doctype html>
 <html lang="es">
 <head>
@@ -64,27 +97,30 @@
         <div class="bg-white rounded-lg shadow-md max-w-4xl mx-auto">
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="relative aspect-square">
-                    <img src="https://media.gq.com/photos/6081b246c1e989d69f6aa8fc/master/w_2000,h_1333,c_limit/Kirkland-Signature-men's-crewneck-T-shirts-(six-pack).jpg" alt="Camiseta de algodón premium" class="w-full h-full object-cover rounded-md">
+                    <img class="p-8 rounded-t-lg w-[336px]" src="http://localhost/ApiRest/<?php echo $imageUrl; ?>" alt="" />
                 </div>
                 <div class="flex flex-col justify-between">
                     <div>
-                        <h1 class="text-2xl md:text-xl font-bungee  mb-2">Camiseta de algodón premium</h1>
-                        <p class="text-darkColor mb-4 font-sf ">Una camiseta suave y cómoda hecha de 100% algodón orgánico. Perfecta para el uso diario y disponible en varios colores.
-                            esta Camisa fue usa en la fiesta de didi
-                            y esta impregnada en esencia para caballeros
-                            ademas de que tiene locion para bebe
-                            directamente desde jhonsons baby
+                        <h1 class="text-2xl md:text-xl font-bungee  mb-2"><?php echo htmlspecialchars($product['name']); ?></h1>
+                        <p class="text-darkColor mb-4 font-sf "><?php echo htmlspecialchars($product['description']); ?>
                         </p>
                     </div>
                     <div>
-                        <p class="text-2xl font-bold font-sf text-darkColor mb-4">$29.99</p>
                         <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
-                            <button class="w-full md:w-auto bg-darkColor text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                                Añadir al carrito
-                            </button>
-                            <button class="w-full md:w-auto bg-pointColor text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors">
-                                Ir a pagar
-                            </button>
+                            <form action="buyProduct.php" method="POST">
+                                <?php if (isset($_SESSION['user']['id'])): ?>
+                                    <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
+                                <?php endif; ?>
+                                <input type="hidden" name="product_id" value="<?php echo $product['idProducts']; ?>">
+                                <input type="hidden" name="quantity" value="1">
+                                <span class="text-3xl font-bold text-gray-900 dark:text-white">
+                                $<?php echo $product['price']; ?>
+                            </span>
+                                <button type="submit" class="w-full md:w-auto bg-darkColor text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                                    Añadir al carrito
+                                </button>
+                            </form>
+                        
                         </div>
                     </div>
                 </div>

@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $quantity = $_POST['quantity'];
 
  
-    $apiUrl = 'http://localhost/ApiRest/Cart/create';
+    $apiUrl = 'http://localhost/apirest/Cart/create';
 
 
     $data = [

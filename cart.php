@@ -9,7 +9,7 @@ if (!isset($_SESSION['user'])) {
 $userId = $_SESSION['user']['id'];
 
 function getCartItems($userId) {
-    $apiUrl = "http://localhost/ApiRest/Cart/getByUser/$userId";
+    $apiUrl = "http://localhost/apirest/Cart/getByUser/$userId";
     $response = file_get_contents($apiUrl);
 
     if ($response === false) {
@@ -23,7 +23,7 @@ function getCartItems($userId) {
 $cartItems = getCartItems($userId);
 
 function getAddress($userId) {
-    $apiUrl = "http://localhost/ApiRest/Address/getActiveAddress/$userId";
+    $apiUrl = "http://localhost/apirest/Address/getActiveAddress/$userId";
     $response = file_get_contents($apiUrl);
 
     if ($response === false) {

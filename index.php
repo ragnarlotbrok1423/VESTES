@@ -3,7 +3,7 @@ session_start();
 
 function getProductsFromAPI($endpoint)
 {
-    $apiUrl = "http://localhost/ApiRest/products/$endpoint";
+    $apiUrl = "http://localhost/apirest/products/$endpoint";
     $response = file_get_contents($apiUrl);
 
 
@@ -35,7 +35,35 @@ if (isset($_GET['category'])) {
     <link href="styles.css" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/flowbite@1.6.4/dist/flowbite.min.js"></script>
+    <style>
+        
+        .search-results {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 600px;
+            z-index: 10;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
+        .search-results.hidden {
+            display: none;
+        }
+
+        .search-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .search-item:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
     <title>VESTES</title>
 </head>
 
@@ -49,7 +77,7 @@ if (isset($_GET['category'])) {
             </div>
 
             <!-- Barra de búsqueda -->
-            <div class="flex-1 max-w-3xl mx-8 ">
+             <div class="flex-1 max-w-3xl mx-8 relative">
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 58 58" fill="none">
@@ -57,10 +85,12 @@ if (isset($_GET['category'])) {
                             <path d="M25.375 32.625L7.25 50.75" stroke="#6F6B6B" stroke-width="5.16667" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                     </div>
-                    <input
-                        type="text"
-                        placeholder="Search Dress..."
-                        class="w-full pl-14 pr-4 py-2 rounded-[47px] bg-[#ccc6c6] text-[#6F6B6B] border-none focus:outline-none font-ubuntu focus:ring-2 focus:ring-gray-200">
+                    <input type="text" placeholder="Search Dress..." id="searchBar" class="w-full pl-14 pr-4 py-2 rounded-[47px] bg-[#ccc6c6] text-[#6F6B6B] border-none focus:outline-none font-ubuntu focus:ring-2 focus:ring-gray-200">
+                </div>
+
+                <!-- Resultados de búsqueda -->
+                <div id="searchResults" class="search-results hidden">
+                    <!-- Aquí se renderizan los resultados -->
                 </div>
             </div>
 
@@ -84,9 +114,15 @@ if (isset($_GET['category'])) {
                         <div class="font-medium truncate"><?php  echo  htmlspecialchars($_SESSION['user']['email'])?></div>
                     </div>
                     <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownInformationButton">
+                        <li>
+                            <a href="seeProfile.php" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Profile</a>
+                        </li>
+                        <li>
+                            <a href="seeAddress.php" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Addresses </a>
+                        </li>
 
                         <li>
-                            <a href="seeAddress.php" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Add Address </a>
+                            <a href="seeOrders.php" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Orders</a>
                         </li>
 
                     </ul>
@@ -163,7 +199,6 @@ if (isset($_GET['category'])) {
 
 
 
-<!-- zona de productos -->
 
     <div class="flex flex-wrap justify-center gap-3 pt-16 pb-12 w-full">
         <?php
@@ -174,9 +209,9 @@ if (isset($_GET['category'])) {
                     $imageUrl = '/uploads/mati.png';
                 }
                 ?>
-                <!-- Cada producto debe estar en su propio div aquí -->
+             
                 <div class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
-                    <a href="#">
+                    <a href="productDetail.php?id=<?php echo $product['idProducts']; ?>">
                         <img class="p-8 rounded-t-lg w-[336px]" src="http://localhost/ApiRest/<?php echo $imageUrl; ?>" alt="" />
                     </a>
                     <div class="px-5 pb-5">
@@ -186,7 +221,7 @@ if (isset($_GET['category'])) {
                             </h5>
                         </a>
                         <div class="flex items-center mt-2.5 mb-5">
-                            <!-- Aquí podrías agregar más elementos -->
+                 
                         </div>
                         <div class="flex items-center justify-between">
                             <form action="buyProduct.php" method="POST">
@@ -221,7 +256,60 @@ if (isset($_GET['category'])) {
 
 
     </div>
+        <form id="redirectForm" method="POST" action="productDetail.php" style="display: none;">
+        <input type="hidden" name="productId" id="productId">
+    </form>
+   <script>
+        const searchBar = document.getElementById('searchBar');
+        const searchResults = document.getElementById('searchResults');
+        const redirectForm = document.getElementById('redirectForm');
+        const productIdInput = document.getElementById('productId');
 
+        searchBar.addEventListener('input', async (e) => {
+            const query = e.target.value.trim();
+
+            if (query.length > 0) {
+                try {
+                    const response = await fetch(`http://localhost/apirest/Products/search/${encodeURIComponent(query)}`);
+                    const results = await response.json();
+
+                   
+                    searchResults.innerHTML = '';
+
+                    if (results.length > 0) {
+                        results.forEach(product => {
+                            const item = document.createElement('div');
+                            item.className = 'search-item';
+                            item.textContent = product.name;
+
+                          
+                            item.addEventListener('click', () => {
+                                productIdInput.value = product.idProducts;
+                                redirectForm.submit();
+                            });
+
+                            searchResults.appendChild(item);
+                        });
+
+                        searchResults.classList.remove('hidden');
+                    } else {
+                        searchResults.innerHTML = '<div class="search-item">No se encontraron resultados</div>';
+                        searchResults.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error('Error al buscar productos:', error);
+                }
+            } else {
+                searchResults.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!searchBar.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 
 </html>
