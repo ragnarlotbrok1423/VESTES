@@ -69,6 +69,7 @@ if (isset($_GET['category'])) {
 
 <body class="bg-[#f0f0f0]">
 
+<<<<<<< HEAD
     <nav class="bg-white shadow-sm px-4 py-4">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <!-- Logo -->
@@ -146,6 +147,10 @@ if (isset($_GET['category'])) {
             </div>
         </div>
     </nav>
+=======
+<!-- Navbar -->
+   <?php include 'navbar.php'; ?>
+>>>>>>> 17439e55ba5bce5eb145e19312b105b6750a0fbe
 
     <!-- zona de categorias -->
     <img src="svg/hero%20section.svg" class="pt-16 px-10" />
