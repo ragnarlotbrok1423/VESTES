@@ -56,7 +56,19 @@
 
                         <li>
                             <a href="seeAddress.php" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Add Address </a>
+                            
                         </li>
+
+                         <li>
+                            <a href="seeAddress.php" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Editar Perfil</a>
+                            
+                        </li>
+                        
+                         <li>
+                            <a href="orders.php" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Ordenes</a>
+                            
+                        </li>
+
 
                     </ul>
                     <div class="py-2">

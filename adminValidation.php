@@ -1,11 +1,11 @@
 <?php
 session_start();
-$apiUrl = 'http://localhost/ApiRest/Costumer/login';
+$apiUrl = 'http://localhost/ApiRest/admin/login';
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
    
-    $email = $_POST['email'] ?? null;
+    $user = $_POST['user'] ?? null;
     $password = $_POST['password'] ?? null;
     
 
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         CURLOPT_POST => true,
         CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
         CURLOPT_POSTFIELDS => json_encode([
-            'email' => $email,
+            'user' => $user,
             'password' => $password
         ])
     ]);
@@ -32,20 +32,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($data['success']) && $data['success'] === true) {
        
         $_SESSION['user'] = [
-            'id' => $data['id'],       
-            'name' => $data['name'],   
-            'email' => $data['email']  
+            'id' => $data['idAdmin'],       
+            'user' => $data['user']
         ];
 
         
-        header('Location: ../VESTES/index.php');
+        header('Location: ../VESTES/adminView.php');
         exit;
     } else {
-          header('Location: login.php?error=1');
+          header('Location: loginAdmin.php?error=1');
             exit;
     }
 } else {
-    header('Location: login.php?error=2');
+    header('Location: loginAdmin.php?error=2');
         exit;
 }
 }

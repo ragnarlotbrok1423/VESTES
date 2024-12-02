@@ -9,7 +9,7 @@ if (!isset($_SESSION['user'])) {
 $userId = $_SESSION['user']['id'];
 
 function getCartItems($userId) {
-    $apiUrl = "http://localhost/apirest/Cart/getByUser/$userId";
+    $apiUrl = "http://localhost/ApiRest/Cart/getByUser/$userId";
     $response = file_get_contents($apiUrl);
 
     if ($response === false) {
@@ -23,7 +23,7 @@ function getCartItems($userId) {
 $cartItems = getCartItems($userId);
 
 function getAddress($userId) {
-    $apiUrl = "http://localhost/apirest/Address/getActiveAddress/$userId";
+    $apiUrl = "http://localhost/ApiRest/Address/getActiveAddress/$userId";
     $response = file_get_contents($apiUrl);
 
     if ($response === false) {
@@ -35,6 +35,18 @@ function getAddress($userId) {
 }
 
 $address = getAddress($userId);
+
+
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    $messageType = $_SESSION['message_type'];
+    echo "<div class='alert alert-{$messageType}'>
+            {$message}
+          </div>";
+    
+    unset($_SESSION['message']);
+    unset($_SESSION['message_type']);
+}
 ?>
 
 
@@ -44,13 +56,31 @@ $address = getAddress($userId);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="styles.css" rel="stylesheet">
-    <script src="cartAddFunctionality.js" />
+    <script src="cartAddFunctionality.js">
 
     <script src="https://cdn.jsdelivr.net/npm/flowbite@1.6.4/dist/flowbite.min.js"></script>
     <title>Cart</title>
+    <style>
+    .alert {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+    }
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+</style>
 </head>
 <body>
-<!-- Navbar -->
 
 <?php include 'navbar.php'; ?>
 
@@ -171,10 +201,19 @@ $address = getAddress($userId);
 
     <!-- Botón de pago -->
     <div class="mt-8">
-        <button class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+    <form action="checkout.php" method="POST">
+        <button 
+            type="submit" 
+            class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded <?php echo empty($cartItems) ? 'opacity-50 cursor-not-allowed' : ''; ?>" 
+            <?php echo empty($cartItems) ? 'disabled' : ''; ?>
+        >
             Proceder al pago
         </button>
-    </div>
+        <?php if (empty($cartItems)): ?>
+            <p class="text-red-500 mt-2 text-sm">El carrito está vacío. Agrega productos para continuar.</p>
+        <?php endif; ?>
+    </form>
+</div>
 </div>
 </body>
 </html>
